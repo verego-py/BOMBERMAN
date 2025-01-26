@@ -36,11 +36,15 @@ class Character:
         self.direct = direct
         self.moveSpeed = 2
 
+        self.boomSpeed = 5
+        self.boomDamage = 1
+
         self.keyLEFT = keyList[0]
         self.keyRIGHT = keyList[1]
         self.keyUP = keyList[2]
         self.keyDOWN = keyList[3]
         self.keySHOT = keyList[4]
+        self.keySHIFT = keyList[5]
 
     def update(self):
         if keys[self.keyLEFT]:
@@ -56,16 +60,42 @@ class Character:
             self.rect.y += self.moveSpeed
             self.direct = 2
 
+        if keys[self.keySHOT]:
+            dx = DIRECTS[self.direct][0] * 30
+            dy = DIRECTS[self.direct][1] * self.boomSpeed
+            Boom(self, self.rect.x, self.rect.y, dx, dy, self.boomDamage)
+
+
     def draw(self):
         pygame.draw.rect(window, self.color, self.rect,)
         x = self.rect.centerx + DIRECTS[self.direct][0] * 30
         y = self.rect.centery + DIRECTS[self.direct][1] * 30
         pygame.draw.line(window, 'white', self.rect.center, (x, y), 4)
 
+class Boom:
+    def __init__(self, parent, px, py, dx, dy, damage):
+        booms.append(self)
+        self.parent = parent
+        self.px = px
+        self.py = py
+        self.dx, self.dy = dx, dy
+        self.damage = damage
+        self.rect = pygame.Rect(px, py, TITLE, TITLE)
+
+
+    def update(self):
+        self.px += self.dx
+        self.py += self.dy
+
+    def draw(self):
+        pygame.draw.rect(window, 'red', (self.px, self.py, TITLE, TITLE), 2)
+
+
+booms = []
 objects = []
 
 
-Character('blue', 100, 275, 0, (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_SPACE))
+Character('blue', 100, 275, 0, (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_SPACE, pygame.K_LSHIFT))
 
 play = True
 while play:
@@ -77,6 +107,8 @@ while play:
 
     for obj in objects:
         obj.update()
+    for boom in booms:
+        boom.update()
 
     window.fill(green)
     for row in range(len(world)):
@@ -88,6 +120,9 @@ while play:
 
     for obj in objects:
         obj.draw()
+
+    for boom in booms:
+        boom.draw()
 
     pygame.display.update()
     clock.tick(FPS)
