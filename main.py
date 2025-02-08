@@ -9,15 +9,15 @@ clock = pygame.time.Clock()
 
 world = [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,],
          [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
-         [2, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2,],
+         [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
          [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
-         [2, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2,],
+         [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
          [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
-         [2, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2,],
+         [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
          [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
-         [2, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2,],
+         [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
          [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
-         [2, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2,],
+         [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
          [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
          [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,],]
 
@@ -32,10 +32,12 @@ class Bomb:
     def __init__(self, color, px, py):
         objects.append(self)
         self.type = "character"
+        objects_types.append(self.type)
 
+        self.px = px
+        self.py = py
         self.color = color
         self.rect = pygame.Rect(px, py, 25, 25)
-        self.moveSpeed = 3
         self.hp = 1
 
         self.shotTimer = 0
@@ -43,22 +45,17 @@ class Bomb:
         self.boomSpeed = 5
         self.boomDamage = 1
 
-
     def update(self):
         if self.shotTimer == 0:
-            dx = DIRECTS[self.direct][0] * 30
-            dy = DIRECTS[self.direct][1] * self.boomSpeed
+            dx = self.px
+            dy = self.py
             Boom(self, self.rect.x, self.rect.y, dx, dy, self.boomDamage)
             self.shotTimer = self.shotDelay
-
         if self.shotTimer > 0:
             self.shotTimer -= 1
 
     def draw(self):
         pygame.draw.rect(window, self.color, self.rect,)
-        x = self.rect.centerx + DIRECTS[self.direct][0] * 20
-        y = self.rect.centery + DIRECTS[self.direct][1] * 20
-        pygame.draw.line(window, 'white', self.rect.center, (x, y), 2)
 
     def damage(self, value):
         self.hp -= value
@@ -70,12 +67,15 @@ class Character:
     def __init__(self, color, px, py, direct, keyList):
         objects.append(self)
         self.type = "character"
+        objects_types.append(self.type)
 
         self.color = color
         self.rect = pygame.Rect(px, py, 25, 25)
         self.direct = direct
         self.moveSpeed = 3
         self.hp = 1
+        self.px = px
+        self.py = py
 
         self.shotTimer = 0
         self.shotDelay = 60
@@ -105,14 +105,12 @@ class Character:
             self.direct = 2
 
         for obj in objects:
-            if obj != self:
+            if objects_types[objects.index(obj)] != self.type:
                 if self.rect.colliderect(obj.rect):
                     self.rect.topleft = oldX, oldY
 
         if keys[self.keySHOT] and self.shotTimer == 0:
-            dx = DIRECTS[self.direct][0] * 30
-            dy = DIRECTS[self.direct][1] * self.boomSpeed
-            Boom(self, self.rect.x, self.rect.y, dx, dy, self.boomDamage)
+            Bomb('black', self.rect.x, self.rect.y)
             self.shotTimer = self.shotDelay
 
         if self.shotTimer > 0:
@@ -134,6 +132,9 @@ class Character:
 class Boom:
     def __init__(self, parent, px, py, dx, dy, damage):
         booms.append(self)
+        self.type = 'Boom'
+        objects_types.append(self.type)
+
         self.parent = parent
         self.px = px
         self.py = py
@@ -161,7 +162,7 @@ class Block:
     def __init__(self, px, py, size):
         objects.append(self)
         self.type = 'block'
-
+        objects_types.append(self.type)
         self.rect = pygame.Rect(px, py, size, size)
         self.hp = 1
 
@@ -182,7 +183,7 @@ class HardBlock:
     def __init__(self, px, py, size):
         objects.append(self)
         self.type = 'block'
-
+        objects_types.append(self.type)
         self.rect = pygame.Rect(px, py, size, size)
         self.hp = 99999
 
@@ -201,10 +202,9 @@ class HardBlock:
 
 booms = []
 objects = []
-
+objects_types = []
 
 Character('blue', 32, 32, 0, (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_SPACE, pygame.K_LSHIFT))
-
 
 
 for row in range(len(world)):
@@ -243,6 +243,5 @@ while play:
 
     for boom in booms:
         boom.draw()
-
     pygame.display.update()
     clock.tick(FPS)
