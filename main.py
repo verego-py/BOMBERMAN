@@ -11,14 +11,14 @@ clock = pygame.time.Clock()
 world = [[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,],
          [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,],
          [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
+         [2, 0, 2, 1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
+         [2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
+         [2, 0, 2, 1, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
+         [2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
          [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
          [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
          [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
-         [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
-         [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
-         [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
-         [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
-         [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
+         [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2,],
          [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,],
          [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,],
          [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,],]
@@ -32,7 +32,7 @@ fontUI = pygame.font.Font(None, 30)
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 
 play = True
-
+menu = False
 
 
 class Character:
@@ -76,8 +76,13 @@ class Character:
             self.rect.y += self.moveSpeed
             self.direct = 2
 
+        print(self.rect.x, self.rect.y)
+        if self.rect.x == 701:
+            if self.rect.y == 322:
+                pygame.quit()
+
         for obj in objects:
-            if objects_types[objects.index(obj)] != self.type and objects_types[objects.index(obj)] != "Enemy":
+            if objects_types[objects.index(obj)] != self.type and objects_types[objects.index(obj)] != "Enemy" and objects_types[objects.index(obj)] != "door":
                 if self.rect.colliderect(obj.rect):
                     self.rect.topleft = oldX, oldY
             if objects_types[objects.index(obj)] == 'Enemy':
@@ -100,7 +105,7 @@ class Character:
     def damage(self, value):
         self.hp -= value
         if self.hp <= 0:
-             objects.remove(self)
+            pygame.quit()
 
 
 class Bomb:
@@ -115,7 +120,7 @@ class Bomb:
         self.rect = pygame.Rect(px, py, 25, 25)
         self.hp = 1
 
-        self.shotTimer = 0
+        self.shotTimer = 60
         self.shotDelay = 60
         self.boomSpeed = 5
         self.boomDamage = 1
@@ -124,8 +129,12 @@ class Bomb:
         if self.shotTimer == 0:
             dx = self.px
             dy = self.py
-            Boom(self, self.rect.x, self.rect.y, dx, dy, self.boomDamage)
-            self.shotTimer = self.shotDelay
+            Boom(self, self.rect.x, self.rect.y, dx, dy, self.boomDamage, 1)
+            Boom(self, self.rect.x, self.rect.y, dx, dy, self.boomDamage, 2)
+            Boom(self, self.rect.x, self.rect.y, dx, dy, self.boomDamage, 3)
+            Boom(self, self.rect.x, self.rect.y, dx, dy, self.boomDamage, 4)
+
+            objects.remove(self)
         if self.shotTimer > 0:
             self.shotTimer -= 1
 
@@ -147,31 +156,35 @@ class Enemy:
         self.color = color
         self.rect = pygame.Rect(px, py, 25, 25)
         self.direct = direct
-        self.moveSpeed = 7
+        self.moveSpeed = 50
         self.hp = 1
         self.px = px
         self.py = py
 
         self.shotTimer = 0
-        self.shotDelay = 60
+        self.shotDelay = 20
         self.boomSpeed = 5
         self.boomDamage = 1
 
     def update(self):
         oldX, oldY = self.rect.topleft
-        rotation = random.randint(0, 4)
-        if rotation == 1:
-            self.rect.x -= self.moveSpeed
-            self.direct = 3
-        if rotation == 4:
-            self.rect.x += self.moveSpeed
-            self.direct = 1
-        if rotation == 3:
-            self.rect.y -= self.moveSpeed
-            self.direct = 0
-        if rotation == 2:
-            self.rect.y += self.moveSpeed
-            self.direct = 2
+        if self.shotTimer > 0:
+            self.shotTimer -= 1
+        else:
+            rotation = random.randint(0, 4)
+            if rotation == 1:
+                self.rect.x -= self.moveSpeed
+                self.direct = 3
+            if rotation == 4:
+                self.rect.x += self.moveSpeed
+                self.direct = 1
+            if rotation == 3:
+                self.rect.y -= self.moveSpeed
+                self.direct = 0
+            if rotation == 2:
+                self.rect.y += self.moveSpeed
+                self.direct = 2
+            self.shotTimer = self.shotDelay
 
         for obj in objects:
             if objects_types[objects.index(obj)] != self.type:
@@ -191,11 +204,12 @@ class Enemy:
 
 
 class Boom:
-    def __init__(self, parent, px, py, dx, dy, damage):
+    def __init__(self, parent, px, py, dx, dy, damage, direct):
         booms.append(self)
         self.type = 'Boom'
         objects_types.append(self.type)
 
+        self.direct = direct
         self.parent = parent
         self.px = px
         self.py = py
@@ -204,8 +218,15 @@ class Boom:
         self.rect = pygame.Rect(px, py, TITLE, TITLE)
 
     def update(self):
-        self.px += self.dx
-        self.py += self.dy
+        if self.direct == 1:
+            self.px += 4
+        if self.direct == 2:
+            self.px -= 4
+        if self.direct == 3:
+            self.py += 4
+        if self.direct == 4:
+            self.py -= 4
+        #self.py += self.dyddddaaaaaaaaaaaaaads
         if self.px < 0 or self.px > WIDTH or self.py < 0 or self.py > HEIGHT:
             booms.remove(self)
         else:
@@ -261,6 +282,27 @@ class HardBlock:
             objects.remove(self)
 
 
+class Door:
+    def __init__(self, px, py, size):
+        objects.append(self)
+        self.type = 'door'
+        objects_types.append(self.type)
+        self.rect = pygame.Rect(px, py, size, size)
+        self.hp = 1
+
+    def update(self):
+        pass
+
+    def draw(self):
+        pygame.draw.rect(window, 'brown', self.rect)
+        pygame.draw.rect(window, 'black', self.rect, 2)
+
+    def damage(self, value):
+        self.hp -= value
+        if self.hp <= 0:
+            pygame.quit()
+
+
 booms = []
 objects = []
 objects_types = []
@@ -277,8 +319,10 @@ for row in range(len(world)):
             Block(x, y, title_size)
         if world[row][col] == 2:
             HardBlock(x, y, title_size)
+        if world[row][col] == 3:
+            Door(x, y, title_size)
 
-time = 999
+time = 9999
 
 while play:
     for event in pygame.event.get():
@@ -313,7 +357,4 @@ while play:
 
     pygame.display.update()
     clock.tick(FPS)
-
-
-
 
